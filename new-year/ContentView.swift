@@ -11,26 +11,75 @@ import SwiftUI
 struct ContentView: View {
     @State private var player: AVAudioPlayer?
     @State private var isPlaying: Bool = false
+    @State private var selectedTab: Int = 0
+
+    @State private var isPressed = false
 
     var body: some View {
+        TabView(selection: $selectedTab) {
+            // Tab 1
+            screen
+                .tabItem {
+                    Image("Home")
+                        .renderingMode(.template)
+                        .foregroundColor(Color(.systemGray6))
+                }
+                .tag(0)
+
+            // Tab 2
+            NavigationView {
+                Text("Поиск").navigationTitle("Поиск")
+            }
+            .tabItem {
+                Image("Play")
+                    .renderingMode(.template)
+                    .foregroundColor(Color(.systemGray6))
+            }
+            .tag(1)
+
+            // Tab 3
+            NavigationView {
+                Text("Избранное").navigationTitle("Избранное")
+            }
+            .tabItem {
+                Image("More Circle")
+                    .renderingMode(.template)
+                    .foregroundColor(Color(.systemGray6))
+            }
+            .tag(2)
+
+            // Tab 4
+            NavigationView {
+                Text("Профиль").navigationTitle("Профиль")
+            }
+            .tabItem {
+                Image("Chat")
+                    .renderingMode(.template)
+                    .foregroundColor(Color(.systemGray6))
+            }
+            .tag(3)
+        }.tint(Color(uiColor: UIColor(red: 111 / 255, green: 117 / 255, blue: 226 / 225, alpha: 1)))
+    }
+
+    var screen: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack {
                     // Верхняя часть с елкой и музыкой
                     VStack(alignment: .leading) {
                         Image("Сhristmas_winter")
                             .resizable()
                             .scaledToFit()
                             .cornerRadius(16)
-                            .padding(.horizontal)
+
 
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Подборка 2024")
-                                    .font(.headline)
+                                    .font(.system(size: 17, weight: .semibold))
 
                                 Text("Frank Sinatra — Christmas Dreaming")
-                                    .font(.subheadline)
+                                    .font(.system(size: 13, weight: .regular))
                                     .foregroundColor(.gray)
                             }
 
@@ -42,47 +91,71 @@ struct ContentView: View {
                                 Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
                                     .resizable()
                                     .frame(width: 40, height: 40)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color(uiColor: UIColor(red: 111 / 255, green: 117 / 255, blue: 226 / 225, alpha: 1)))
                             }
-                        }
-                        .padding(.horizontal)
-                    }
+                        }.padding(
+                            EdgeInsets(
+                                top: 8,
+                                leading: 20,
+                                bottom: 8,
+                                trailing: 20
+                            )
+                        )
 
+                    }
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(20)
+                    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 4)
+                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+
+                    Spacer(minLength: 20)
                     // Заголовок пожеланий
-                    Text("Пожелания в Новом году")
-                        .font(.title2)
-                        .bold()
-                        .padding(.horizontal)
+                    HStack {
+                        Text("Пожелания в Новом году")
+                            .font(.system(size: 22, weight: .semibold))
+                            .padding(.leading, 20)
+                            .multilineTextAlignment(.center)
+                        Spacer()
+                    }.frame(width: UIScreen.main.bounds.width, height: 40)
 
-                    // Сетка пожеланий
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 16) {
-                        ForEach(wishes, id: \.id) { wish in
-                            VStack(spacing: 12) {
-                                Image(wish.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxWidth: .infinity)
+                    Spacer(minLength: 12)
 
-                                Text(wish.text)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .multilineTextAlignment(.center)
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(spacing: 12) {
+                            ForEach(wishes, id: \.id) { wish in
+                                Card(wish: wish)
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(16)
-                            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
                         }
-                    }
-                    .padding(.horizontal)
+                        VStack(spacing: 12) {
+                            ForEach(wishes2, id: \.id) { wish in
+                                Card(wish: wish)
+                            }
+                        }
+                    }.padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
                 }
                 .padding(.top)
             }
             .navigationTitle("Хо-хо-хо!")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        // Left button action
+                    }) {
+                        Image("Seach")
+                            .foregroundColor(.black)
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // Right button action
+                    }) {
+                        Image("Notification")
+                            .foregroundColor(.black)
+                    }
+                }
+            }
         }
     }
 
@@ -123,8 +196,11 @@ struct Wish: Identifiable {
 // Пример данных для пожеланий
 let wishes = [
     Wish(imageName: "Santa", text: "Удачного года без deprecated API!"),
-    Wish(imageName: "Gloves", text: "Пусть App Store никогда не тормозит модерацию!"),
     Wish(imageName: "Socks", text: "Пусть новые фичи не ломают старые релизы!"),
+]
+
+let wishes2 = [
+    Wish(imageName: "Gloves", text: "Пусть App Store никогда не тормозит модерацию!"),
     Wish(imageName: "Cookie", text: "Стабильной работы Xcode... ну хоть на праздники!")
 ]
 
